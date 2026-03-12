@@ -164,19 +164,24 @@ function App() {
       // Currently mocked to log the success since real API keys are needed, 
       // but the exact payload and logic are ready for production.
       // -------------------------------------------------------------
+      const chatLog = [...messages, { sender: 'user', text: userMessage }]
+        .map(m => `${m.sender === 'bot' ? 'Serene' : userData.name || 'User'}: ${m.text}`)
+        .join('\n');
+
       const emailParams = {
-        reply_to: userData.emergencyContact, // Matches EmailJS implicit "To:" or "Reply-To:" field
-        to_email: userData.emergencyContact, // Backup definition
+        to_email: userData.emergencyContact,
         user_name: userData.name,
-        risk_factor: detectedKeyword,
-        time: new Date().toLocaleString()
+        risk_factor: "Suicide Thoughts",
+        time: new Date().toLocaleString(),
+        chat_log: chatLog
       };
 
-      // Here is the EXACT emailjs integration you asked for!
-      // I am passing the exact Service ID and Template ID you gave me.
-      // NOTE: You still need to insert your "Public Key" (the 3rd parameter) to authorize it.
-
-      emailjs.send('service_e6qslfs', 'template_mlfzooz', emailParams, '7kp1xc0x3pv9cxGMw')
+      emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        emailParams,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      )
         .then((response) => {
           console.log('SILENT ALERT SUCCESSFULLY SENT!', response.status, response.text);
           // Optional: You could show a small toast notification here
