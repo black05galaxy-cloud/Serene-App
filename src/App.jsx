@@ -171,9 +171,13 @@ function App() {
       const emailParams = {
         to_email: userData.emergencyContact,
         user_name: userData.name,
+        name: userData.name,
+        age: userData.age,
+        occupation: userData.occupation,
         risk_factor: "Suicide Thoughts",
         time: new Date().toLocaleString(),
-        chat_log: chatLog
+        chat_log: chatLog,
+        chat_history: chatLog
       };
 
       emailjs.send(
