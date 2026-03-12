@@ -15,7 +15,7 @@ function App() {
   const [userData, setUserData] = useState(() => {
     const savedData = localStorage.getItem('sereneUserData');
     if (savedData) return JSON.parse(savedData);
-    return { name: '', age: '', occupation: '', emergencyContact: '', apiKey: 'AIzaSyASbzuTn8zNHl3WLBPWjlDhSDe1FxymDVk' };
+    return { name: '', age: '', occupation: '', emergencyContact: '', apiKey: 'AIzaSyDpdJo9Sl_fAr8IUC5kuBrScRBaCJHUU4w' };
   });
   const [messages, setMessages] = useState([
     { sender: 'bot', text: 'Hello! I am Serene, your digital companion. I am here for you 24/7. Type English or Tamil.' }
@@ -331,6 +331,16 @@ function App() {
                 required
               />
             </div>
+            <div className="input-group">
+              <label>Gemini API Key</label>
+              <input
+                type="text"
+                placeholder="Enter your Gemini API Key"
+                value={userData.apiKey}
+                onChange={(e) => setUserData({ ...userData, apiKey: e.target.value })}
+                required
+              />
+            </div>
             <button type="submit" className="primary-btn">Begin Journey safely</button>
           </form>
         </div>
@@ -630,6 +640,7 @@ function App() {
             <p><strong>Age:</strong> {userData.age}</p>
             <p><strong>Occupation:</strong> {userData.occupation}</p>
             <p><strong>Guardian Mail:</strong> {userData.emergencyContact}</p>
+            <p><strong>API Key:</strong> {userData.apiKey ? '••••••••••••••••' : 'Not Set'}</p>
             <button className="primary-btn" style={{ background: '#dc3545', color: '#fff', marginTop: '15px', alignSelf: 'flex-start' }} onClick={() => {
               localStorage.removeItem('sereneUserData');
               localStorage.removeItem('sereneSavedNotes');
