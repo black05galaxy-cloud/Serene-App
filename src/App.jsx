@@ -15,7 +15,8 @@ function App() {
   const [userData, setUserData] = useState(() => {
     const savedData = localStorage.getItem('sereneUserData');
     if (savedData) return JSON.parse(savedData);
-    return { name: '', age: '', occupation: '', emergencyContact: '', apiKey: import.meta.env.VITE_GEMINI_API_KEY };
+    return { name: '', age: '', occupation: '', emergencyContact: '', apiKey: import.meta.env.VITE_GEMINI_API_KEY || '' };
+  });
   const [messages, setMessages] = useState([
     { sender: 'bot', text: 'Hello! I am Serene, your digital companion. I am here for you 24/7. Type English or Tamil.' }
   ]);
@@ -92,13 +93,14 @@ function App() {
 
   const handleOnboardingSubmit = async (e) => {
     e.preventDefault();
-    if (userData.name && userData.age && userData.occupation && userData.emergencyContact && userData.apiKey) {
+    if (userData.name && userData.age && userData.occupation && userData.emergencyContact) {
       try {
+        const currentData = { ...userData, apiKey: import.meta.env.VITE_GEMINI_API_KEY || '' };
         // Save to browser persistence database (simulating the Anvil server setting)
-        localStorage.setItem('sereneUserData', JSON.stringify(userData));
+        localStorage.setItem('sereneUserData', JSON.stringify(currentData));
 
         // Initialize Gemini model with system instruction for a human, empathetic persona
-        const genAI = new GoogleGenerativeAI(userData.apiKey);
+        const genAI = new GoogleGenerativeAI(currentData.apiKey);
         const model = genAI.getGenerativeModel({
           model: "gemini-2.5-flash",
           systemInstruction: `You are Serene, an empathetic, non-judgmental mental health companion. The user's name is ${userData.name}. They are ${userData.age} years old and work as a ${userData.occupation}. You must be fluent in both English and Tamil. Speak conversationally and warmly, like a close friend. Avoid robotic lists or generic advice. Keep answers relatively short (2-3 sentences max) to ensure a natural chat flow.`
@@ -115,10 +117,10 @@ function App() {
         setChatSession(chat);
         setAppState('app');
       } catch (err) {
-        alert("Failed to initialize AI. Please ensure your API Key is correct.");
+        alert("Failed to initialize AI. Please ensure your configuration is correct.");
       }
     } else {
-      alert("Please provide all required details, including the Gemini API Key.");
+      alert("Please provide all required details.");
     }
   };
 
@@ -327,16 +329,6 @@ function App() {
                 placeholder="Required for immediate support alerts"
                 value={userData.emergencyContact}
                 onChange={(e) => setUserData({ ...userData, emergencyContact: e.target.value })}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label>Gemini API Key</label>
-              <input
-                type="text"
-                placeholder="Enter your Gemini API Key"
-                value={userData.apiKey}
-                onChange={(e) => setUserData({ ...userData, apiKey: e.target.value })}
                 required
               />
             </div>
@@ -639,10 +631,10 @@ function App() {
             <p><strong>Age:</strong> {userData.age}</p>
             <p><strong>Occupation:</strong> {userData.occupation}</p>
             <p><strong>Guardian Mail:</strong> {userData.emergencyContact}</p>
-            <p><strong>API Key:</strong> {userData.apiKey ? '••••••••••••••••' : 'Not Set'}</p>
             <button className="primary-btn" style={{ background: '#dc3545', color: '#fff', marginTop: '15px', alignSelf: 'flex-start' }} onClick={() => {
-              localStorage.removeItem('sereneUserData');
-              localStorage.removeItem('sereneSavedNotes');
+              const prevNotes = localStorage.getItem('sereneSavedNotes');
+              localStorage.clear();
+              if (prevNotes) localStorage.setItem('sereneSavedNotes', prevNotes);
               window.location.reload();
             }}>Log Out</button>
           </div>
