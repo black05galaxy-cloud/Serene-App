@@ -15,8 +15,7 @@ function App() {
   const [userData, setUserData] = useState(() => {
     const savedData = localStorage.getItem('sereneUserData');
     if (savedData) return JSON.parse(savedData);
-    return { name: '', age: '', occupation: '', emergencyContact: '', apiKey: 'AIzaSyDpdJo9Sl_fAr8IUC5kuBrScRBaCJHUU4w' };
-  });
+    return { name: '', age: '', occupation: '', emergencyContact: '', apiKey: import.meta.env.VITE_GEMINI_API_KEY };
   const [messages, setMessages] = useState([
     { sender: 'bot', text: 'Hello! I am Serene, your digital companion. I am here for you 24/7. Type English or Tamil.' }
   ]);
