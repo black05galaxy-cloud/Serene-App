@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Home, MessageCircle, AlertTriangle, Shield, Heart, BookOpen, PenTool, Settings, Activity } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import emailjs from '@emailjs/browser';
+emailjs.init('9G0a9-lXN5E6G2iU4');
 import './App.css';
 
 // 100% Accuracy Precision Keyword Engine (Never fails for the pitch)
@@ -168,45 +169,28 @@ function App() {
         .map(m => `${m.sender === 'bot' ? 'Serene' : userData.name || 'User'}: ${m.text}`)
         .join('\n');
 
-      const emailParams = {
-        to_email: userData.emergencyContact,
-        user_name: userData.name,
-        name: userData.name,
-        age: userData.age,
-        occupation: userData.occupation,
-        risk_factor: "Suicide Thoughts",
+      const templateParams = {
+        user_name: userData.name, // using userData.name as requested
+        to_email: userData.emergencyContact, // using userData.emergencyContact as requested
+        risk_factor: "High",
         time: new Date().toLocaleString(),
-        chat_log: chatLog,
-        chat_history: chatLog
       };
 
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-      const fallbackMailto = () => {
-        const subject = `URGENT: Mental Health Alert for ${userData.name}`;
-        const body = `URGENT ALERT\n\nName: ${userData.name}\nAge: ${userData.age}\nOccupation: ${userData.occupation}\nRisk Factor: Suicide Thoughts\nTime: ${new Date().toLocaleString()}\n\nChat Log:\n${chatLog}\n\nPlease reach out to them immediately.`;
-        const mailtoLink = `mailto:${userData.emergencyContact}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailtoLink;
-      };
-
-      if (serviceId && templateId && publicKey) {
-        emailjs.send(serviceId, templateId, emailParams, publicKey)
-          .then((response) => {
-            console.log('SILENT ALERT SUCCESSFULLY SENT!', response.status, response.text);
-          }, (error) => {
-            console.error('FAILED TO SEND SILENT ALERT:', error);
-            alert('EmailJS failed to send silent alert. Opening default email client.');
-            fallbackMailto();
-          });
-      } else {
-        console.warn('EmailJS not configured in environment variables. Falling back to default mail client.');
-        fallbackMailto();
-      }
+      emailjs.send(
+        'service_7oouh1i', 
+        'template_mlfzooz', 
+        templateParams
+      )
+      .then((result) => {
+        alert("Email Sent Successfully!");
+        console.log(result.text);
+      }, (error) => {
+        alert("Error: " + error.text);
+        console.log(error.text);
+      });
 
       console.log("CRITICAL ALERT DISPATCH INITIATED TO:", userData.emergencyContact);
-      console.log("Email Payload:", emailParams);
+      console.log("Email Payload:", templateParams);
 
       // Delay response slightly for natural feel
       setTimeout(() => {
