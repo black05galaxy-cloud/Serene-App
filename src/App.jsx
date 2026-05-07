@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Home, MessageCircle, AlertTriangle, Shield, Heart, BookOpen, PenTool, Settings, Activity } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import emailjs from '@emailjs/browser';
-emailjs.init('9G0a9-lXN5E6G2iU4');
+emailjs.init('sYsSmO4aTIKlDnRqo');
 import './App.css';
 
 // 100% Accuracy Precision Keyword Engine (Never fails for the pitch)
