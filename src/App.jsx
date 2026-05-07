@@ -180,23 +180,30 @@ function App() {
         chat_history: chatLog
       };
 
-      emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        emailParams,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      )
-        .then((response) => {
-          console.log('SILENT ALERT SUCCESSFULLY SENT!', response.status, response.text);
-          // Optional: You could show a small toast notification here
-        }, (error) => {
-          console.error('FAILED TO SEND SILENT ALERT:', error);
-          alert('EmailJS Error: ' + (error.text || error.message || 'Unknown Error'));
-        });
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-      // We have disabled the mailto popup because we are now attempting the silent send above.
-      // const mailtoLink = `mailto:${userData.emergencyContact}?subject=${encodeURIComponent(emailParams.subject)}&body=${encodeURIComponent(emailParams.message)}`;
-      // window.open(mailtoLink, '_blank');
+      const fallbackMailto = () => {
+        const subject = `URGENT: Mental Health Alert for ${userData.name}`;
+        const body = `URGENT ALERT\n\nName: ${userData.name}\nAge: ${userData.age}\nOccupation: ${userData.occupation}\nRisk Factor: Suicide Thoughts\nTime: ${new Date().toLocaleString()}\n\nChat Log:\n${chatLog}\n\nPlease reach out to them immediately.`;
+        const mailtoLink = `mailto:${userData.emergencyContact}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
+      };
+
+      if (serviceId && templateId && publicKey) {
+        emailjs.send(serviceId, templateId, emailParams, publicKey)
+          .then((response) => {
+            console.log('SILENT ALERT SUCCESSFULLY SENT!', response.status, response.text);
+          }, (error) => {
+            console.error('FAILED TO SEND SILENT ALERT:', error);
+            alert('EmailJS failed to send silent alert. Opening default email client.');
+            fallbackMailto();
+          });
+      } else {
+        console.warn('EmailJS not configured in environment variables. Falling back to default mail client.');
+        fallbackMailto();
+      }
 
       console.log("CRITICAL ALERT DISPATCH INITIATED TO:", userData.emergencyContact);
       console.log("Email Payload:", emailParams);
